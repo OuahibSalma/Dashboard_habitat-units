@@ -53,28 +53,18 @@ def create_donut(df2):
     numeric_cols = df2.select_dtypes(include='number')
 # Calculer la somme des colonnes numériques pour chaque ligne
     df2['Total'] = numeric_cols.sum(axis=1)
-# Définir les plages de l'intrigue
     xdr = Range1d(start=-2, end=2)
     ydr = Range1d(start=-2, end=2)
-# Créer la figure de la parcelle
     plot = figure(x_range=xdr, y_range=ydr, title="Distribution des catégories", toolbar_location=None, width = 600 , height = 500 )
 # Nettoyer et obtenir les catégories
     categories = pd.Series(df2['Categories'].astype(str)).str.strip().unique()
-# Exclure la catégorie 'Total'
     categories_without_total = [category for category in categories if category not in ["Total", "Total general"]]
-# Assurez-vous que les listes de couleurs et de catégories correspondent en longueur
     c = ["blue", "seagreen", "red", "firebrick"]
 # Construire le dictionnaire des couleurs
     co = {category: color for category, color in zip(categories_without_total, c)}
 
 # Créer la liste des couleurs correspondantes
-    try:
-        colors_list = [co[category] for category in categories_without_total]
-        print("Liste des couleurs correspondantes:", colors_list)
-    except KeyError as e:
-     print(f"KeyError: {e}. Assurez-vous que toutes les catégories ont une couleur correspondante.")
-
-# Calculer les angles pour le graphique en anneau
+    colors_list = [co[category] for category in categories_without_total]
     angles = df2['Total'].map(lambda x: 2*pi*(x/df2['Total'].sum())).cumsum().tolist()
     start_angles = [0] + angles[:-1]
 
@@ -85,13 +75,10 @@ def create_donut(df2):
     co=colors_list
 ))
 
-# Créer le glyph de l'anneau
     glyph = AnnularWedge(x=0, y=0, inner_radius=1.2, outer_radius=1.5,
                      start_angle="start", end_angle="end",
                      line_color="white", line_width=3, fill_color="co")
     r = plot.add_glyph(categories_source, glyph)
-
-# Ajouter la légende
     legend = Legend(location="center")
     for i, name in enumerate(co):
         legend.items.append(LegendItem(label=name, renderers=[r], index=i))
@@ -152,7 +139,7 @@ def firstdashboard():
     <span style='color: #87CEEB;'>{total_sum_Lots}</span></h2>
     """, width= 600 , height=50)   
     
-    # Les eleemnts de la premiere page: 
+    # Les éléments de la premiere page: 
     button = create_button("Plus de détails" , "success" , details_page)
     layout1 = column(contenu2,contenu3, mixed ) 
     layout2 = column(contenu1, donut) 
